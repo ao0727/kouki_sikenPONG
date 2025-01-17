@@ -7,7 +7,7 @@ GameState Title::Update() {
     DrawString(200, 350, "Press E to Exit", GetColor(255, 255, 255));
 
     if (CheckHitKey(KEY_INPUT_RETURN)) {
-        return PLAYING; // EnterÇ≈ÉQÅ[ÉÄäJén
+        return PLAYING; 
     }
    
 }

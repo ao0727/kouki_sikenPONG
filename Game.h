@@ -3,7 +3,7 @@
 
 #include "DxLib.h"
 #include "GameState.h"
-#include "Score.h"  // Score クラスのインクルード
+#include "Score.h"  
 
 class Paddle;
 class Ball;
@@ -11,7 +11,7 @@ class Score;
 
 class Game {
 public:
-    // コンストラクタ
+    
     Game();
 
     // 更新処理

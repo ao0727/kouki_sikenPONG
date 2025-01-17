@@ -2,7 +2,7 @@
 #define TITLE_H
 
 #include "DxLib.h"
-#include "GameState.h" // GameState‚ğQÆ
+#include "GameState.h" 
 
 class Title {
 public:

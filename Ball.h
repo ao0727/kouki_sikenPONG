@@ -3,8 +3,7 @@
 
 #include "DxLib.h"
 #include "Paddle.h"
-#include "Score.h"  // Score クラスのインクルード
-
+#include "Score.h"  
 class Ball {
 private:
     int x, y;       // ボールの位置
@@ -13,7 +12,7 @@ private:
     Score& score;   // Score クラスの参照
 
 public:
-    // コンストラクタ
+    
     Ball(int startX, int startY, Score& scoreRef);
 
     // ボールの更新
