@@ -58,13 +58,16 @@ void Ball::Reset(int startX, int startY) {
     /*speedX = 5;
     speedY = 5;*/
 
-    int randomAngle = rand() % 120 + 30;
-    double radian = randomAngle * 3.14159265 / 180.0; // 角度をラジアンに変換
+    double fixedSpeed = 7.0;
 
-    // X, Y の速度を計算
-    speedX = (rand() % 2 == 0 ? 1 : -1) * 5 * cos(radian); // X方向の速度
-    speedY = 5 * sin(radian);
+    //ボール再生成後の挙動が一緒だったからランダムに変更
 
+    int randomAngle = rand() % 120 - 30; // 30 ～ 149の乱数　角度
+    double radian = randomAngle * 3.14 / 180.0; 
+
+    // X, Y方向の速度を計算
+    speedX = (rand() % 2 == 0 ? 1 : -1) * fixedSpeed * cos(radian); 
+    speedY = fixedSpeed * sin(radian);
 
 
 }

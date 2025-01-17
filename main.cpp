@@ -14,6 +14,11 @@ W‚ÆS‚Åã‰ºˆÚ“®
 #include <ctime>
 
 
+int main() {
+    srand(static_cast<unsigned>(time(0))); //—”
+}
+
+
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ChangeWindowMode(TRUE);
     if (DxLib_Init() == -1) return -1;
