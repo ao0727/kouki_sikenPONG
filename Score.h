@@ -7,10 +7,10 @@ class Score {
 private:
     int playerScore; // プレイヤーのスコア
     int cpuScore;    // CPUのスコア
-    const int winScore = 11; // 勝利条件のスコア
+    const int winScore = 5; // 勝利条件
 
 public:
-    // コンストラクタ
+    
     Score();
 
     // スコアの更新

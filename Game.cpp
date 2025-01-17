@@ -3,14 +3,14 @@
 #include "Ball.h"
 #include "Score.h"
 
-// プレイヤーパドルとCPUパドルをインスタンス化
-Paddle playerPaddle(50, 200);  // プレイヤーのパドル (x座標,y座標)
-Paddle cpuPaddle(550, 200);    // CPUのパドル (x座標,y座標)
+// パドルをインスタンス
+Paddle playerPaddle(50, 200);  // プレイヤーのパドル 
+Paddle cpuPaddle(550, 200);    // CPUのパドル 
 Score score;                   // スコア
-Ball ball(300, 240, score);    // ボール (x座標,y座標) と Score を渡す
+Ball ball(300, 240, score);    // ボールと Score 
 
 Game::Game() {
-    // コンストラクタでの初期化処理は不要
+   
 }
 
 GameState Game::Update() {

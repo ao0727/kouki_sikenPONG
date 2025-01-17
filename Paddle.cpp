@@ -4,6 +4,7 @@
 
 Paddle::Paddle(int startX, int startY) : x(startX), y(startY), width(10), height(60), speed(5) {}
 
+
 void Paddle::Update(int upKey, int downKey) {
     if (CheckHitKey(upKey) && y > 0) {
         y -= speed;
@@ -13,6 +14,7 @@ void Paddle::Update(int upKey, int downKey) {
     }
 }
 
+//ボールのY座標に応じてCPUのパドルを移動させる
 void Paddle::AIControl(const Ball& ball) {
     if (ball.GetY() < y && y > 0) {
         y -= speed;
