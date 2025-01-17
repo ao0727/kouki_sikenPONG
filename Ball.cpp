@@ -1,6 +1,9 @@
 #include "Ball.h"
 #include "DxLib.h"
 
+#include <cstdlib> 
+#include <ctime>   
+
 //ボールの挙動やスコア管理をする
 
 Ball::Ball(int startX, int startY, Score& scoreRef)
@@ -52,6 +55,16 @@ void Ball::CheckCollision(Paddle& player, Paddle& cpu) {
 void Ball::Reset(int startX, int startY) {
     x = startX;
     y = startY;
-    speedX = 5;
-    speedY = 5;
+    /*speedX = 5;
+    speedY = 5;*/
+
+    int randomAngle = rand() % 120 + 30;
+    double radian = randomAngle * 3.14159265 / 180.0; // 角度をラジアンに変換
+
+    // X, Y の速度を計算
+    speedX = (rand() % 2 == 0 ? 1 : -1) * 5 * cos(radian); // X方向の速度
+    speedY = 5 * sin(radian);
+
+
+
 }

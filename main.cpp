@@ -1,8 +1,18 @@
+/*エンターでスタート　Eで終了
+WとSで上下移動
+5本先取
+*/
+
+
 #include "DxLib.h"
 #include "Title.h"
 #include "Game.h"
 #include "Menu.h"
 #include "GameState.h"
+
+#include <cstdlib>
+#include <ctime>
+
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ChangeWindowMode(TRUE);

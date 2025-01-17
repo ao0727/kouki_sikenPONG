@@ -2,11 +2,11 @@
 #define MENU_H
 
 #include "DxLib.h"
-#include "GameState.h" // GameState ‚ª’è‹`‚³‚ê‚Ä‚¢‚é‚±‚Æ‚ğŠm”F
+#include "GameState.h" 
 
 class Menu {
 public:
-    GameState Update(); // ³‚µ‚¢ŠÖ”éŒ¾
+    GameState Update(); 
 };
 
-#endif // MENU_H
+#endif 
