@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">壁紙スライドショー</string>
+    <string name="add_images">画像を追加</string>
+    <string name="clear_images">すべて削除</string>
+    <string name="images_header">選択中の画像 (%1$d 枚)</string>
+    <string name="images_hint">長押しでドラッグして並び替え / ✕で削除</string>
+    <string name="empty_images">まだ画像がありません。\n「画像を追加」から選んでください。</string>
+    <string name="interval">切り替え間隔</string>
+    <string name="shuffle">ランダムな順番で切り替える</string>
+    <string name="apply_lock">ロック画面にも適用する</string>
+    <string name="start">スライドショー開始</string>
+    <string name="stop">スライドショー停止</string>
+    <string name="next_now">今すぐ次の画像へ</string>
+    <string name="status_stopped">停止中</string>
+    <string name="status_running">実行中 (%1$s ごと)</string>
+    <string name="status_next">次回の切り替え予定: %1$s</string>
+    <string name="status_last">最後に切り替えた時刻: %1$s</string>
+    <string name="need_images">先に画像を1枚以上追加してください</string>
+    <string name="added_images">%1$d 枚追加しました</string>
+    <string name="clear_confirm_title">すべて削除しますか?</string>
+    <string name="clear_confirm_message">選択中の画像をすべてリストから削除します。スライドショーも停止します。</string>
+    <string name="delete">削除</string>
+    <string name="cancel">キャンセル</string>
+    <string name="started">スライドショーを開始しました</string>
+    <string name="stopped">スライドショーを停止しました</string>
+    <string name="current_badge">表示中</string>
+    <string name="remove_image">画像を削除</string>
+    <string name="note">※ Androidの仕様上、省電力状態などにより切り替えが数分ずれることがあります。最短間隔は15分です。</string>
+</resources>
