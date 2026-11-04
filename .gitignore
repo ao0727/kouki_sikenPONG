@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# keiba app
+keiba/model.pkl
+keiba/**/__pycache__/
+keiba/.pytest_cache/
