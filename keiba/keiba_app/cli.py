@@ -63,6 +63,10 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("csv")
     c.add_argument("--weights", default=DEFAULT_WEIGHTS)
     c.add_argument("--test-ratio", type=float, default=0.2)
+    c.add_argument("--walk", action="store_true",
+                   help="ウォークフォワード: 過去だけで学習し直しながら、ほぼ全期間をテストする")
+    c.add_argument("--min-train", type=int, default=100, help="--walk で最初に学習に使うレース数")
+    c.add_argument("--test-from", help="--walk でこの日付(YYYY-MM-DD)以降をテストする。それより前は学習専用")
 
     tp = sub.add_parser("template", help="入力用の空 CSV を作る")
     tp.add_argument("csv")
@@ -87,15 +91,16 @@ def main(argv: list[str] | None = None) -> int:
 
         elif a.cmd == "compare":
             hist = load_csv(a.csv, need_result=True)
-            table = compare_methods(hist, load_weights(a.weights), a.test_ratio)
+            table = compare_methods(hist, load_weights(a.weights), a.test_ratio, a.walk, a.min_train, a.test_from)
             print(f"学習 {table.attrs['学習レース数']} レース → テスト {table.attrs['テストレース数']} レース\n")
             show = table.copy()
-            for col in ["本命の単勝的中率", "本命の複勝率", "本命単勝の回収率", "期待値買いの回収率"]:
+            for col in ["本命の単勝的中率", "本命の複勝率", "馬連的中率(3点)", "ワイド的中率(2点)",
+                        "3連複的中率(10点)", "本命単勝の回収率", "期待値買いの回収率"]:
                 show[col] = show[col].map(lambda v: "-" if pd.isna(v) else f"{v*100:.1f}%")
             show["期待値買いの点数"] = show["期待値買いの点数"].astype(int)
             show["対数損失"] = show["対数損失"].map(lambda v: f"{v:.3f}")
             with pd.option_context("display.unicode.east_asian_width", True, "display.width", 200):
-                print(show.drop(columns=["レース数"]).to_string())
+                print(show.drop(columns=["レース数"]).T.to_string())
             print(f"\n→ 確率が一番正確なのは「{best_method(table)}」です（対数損失が最小）")
             print("  ※ 回収率 100% 超え = 利益。テスト期間が短いと運の影響が大きいので注意。")
 

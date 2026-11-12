@@ -365,3 +365,4 @@ FodyWeavers.xsd
 keiba/model.pkl
 keiba/**/__pycache__/
 keiba/.pytest_cache/
+keiba/data/cache/
