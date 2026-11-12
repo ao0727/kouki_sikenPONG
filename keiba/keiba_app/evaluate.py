@@ -149,6 +149,5 @@ def compare_methods(history: pd.DataFrame, weights=None, test_ratio: float = 0.2
 
 
 def best_method(table: pd.DataFrame) -> str:
-    """対数損失が一番小さい（確率が一番正確な）方式を返す。人気順は除く。"""
-    candidates = table.drop(index=[i for i in table.index if i.startswith("人気順")])
-    return str(candidates["対数損失"].astype(float).idxmin())
+    """対数損失が一番小さい（確率が一番正確な）方式を返す。"""
+    return str(table["対数損失"].astype(float).idxmin())

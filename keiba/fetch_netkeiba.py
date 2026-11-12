@@ -114,7 +114,7 @@ def find_race_id(d: date, name: str, grade: str, venue: str) -> str | None:
 def parse_result(html: str) -> tuple[dict, list[dict]]:
     soup = BeautifulSoup(html, "lxml")
     info_txt = soup.select_one(".mainrace_data").get_text(" ", strip=True)
-    m = re.search(r"(芝|ダ)[右左直外内\s]*?(\d{3,4})m", info_txt)
+    m = re.search(r"(芝|ダ)[^/]*?(\d{3,4})m", info_txt)
     going = re.search(r"(?:芝|ダート)\s*:\s*(良|稍重|重|不良)", info_txt)
     info = {"芝ダ": m.group(1) if m else None, "距離": int(m.group(2)) if m else None,
             "馬場": going.group(1) if going else None}
