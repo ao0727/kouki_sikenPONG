@@ -25,8 +25,11 @@ DEFAULT_WEIGHTS = "weights.json"
 
 
 def run_predict(race_csv: str, method: str = "auto", model_path: str = DEFAULT_MODEL,
-                weights_path: str = DEFAULT_WEIGHTS, use_odds: bool = True) -> tuple[pd.DataFrame, str]:
+                weights_path: str = DEFAULT_WEIGHTS, use_odds: bool = True,
+                runs_path: str | None = None, history_path: str | None = None) -> tuple[pd.DataFrame, str]:
     df = load_csv(race_csv)
+    if method in ("career", "benter"):
+        return _predict_with_runs(df, method, runs_path, history_path, use_odds)
     if method == "auto":
         method = "ml" if Path(model_path).exists() else "score"
     if method == "ml":
@@ -41,17 +44,40 @@ def run_predict(race_csv: str, method: str = "auto", model_path: str = DEFAULT_M
     return pred, label
 
 
+def _predict_with_runs(df, method, runs_path, history_path, use_odds):
+    """馬の全戦績を使う方式。出馬表に「馬ID」列が必要。"""
+    from .horse_features import add_horse_features, load_runs
+    from .horse_model import BenterLogit, CareerGBM, build_career_table
+    if not runs_path or not Path(runs_path).exists():
+        raise FileNotFoundError("--runs に馬の全戦績 CSV（fetch_horses.py で作成）を指定してください")
+    if "馬ID" not in df.columns:
+        raise ValueError("戦績を使う方式では、出馬表 CSV に「馬ID」列（netkeiba の馬 ID）が必要です")
+    runs = load_runs(runs_path)
+    entries = add_horse_features(df, runs)
+    odds_txt = "オッズあり" if use_odds else "オッズなし"
+    if method == "career":
+        model = CareerGBM(build_career_table(runs), use_odds).fit_until(df["日付"].min())
+        return model.predict(entries), f"全戦績ML（{odds_txt}）"
+    if not history_path or not Path(history_path).exists():
+        raise FileNotFoundError("ベンター式には --history に過去の重賞 CSV が必要です")
+    hist = add_horse_features(load_csv(history_path, need_result=True), runs)
+    hist = hist[hist["日付"] < df["日付"].min()]
+    return BenterLogit(l2=30, use_odds=use_odds).fit(hist).predict(entries), f"ベンター式（{odds_txt}）"
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="keiba", description="競馬予想アプリ")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     p = sub.add_parser("predict", help="出馬表 CSV から予想する")
     p.add_argument("csv")
-    p.add_argument("--method", choices=["auto", "score", "ml"], default="auto",
+    p.add_argument("--method", choices=["auto", "score", "ml", "career", "benter"], default="auto",
                    help="auto: モデルがあれば機械学習、無ければ点数式")
     p.add_argument("--model", default=DEFAULT_MODEL)
     p.add_argument("--weights", default=DEFAULT_WEIGHTS)
-    p.add_argument("--no-odds", action="store_true", help="オッズを使わずに予想する（点数式のみ）")
+    p.add_argument("--no-odds", action="store_true", help="オッズを使わずに予想する")
+    p.add_argument("--runs", default="data/horse_runs.csv", help="career / benter で使う馬の全戦績 CSV")
+    p.add_argument("--history", default="data/graded_history.csv", help="benter で使う過去の重賞 CSV")
     p.add_argument("--out", help="予想結果を CSV に保存する")
 
     t = sub.add_parser("train", help="過去レース CSV（着順つき）で機械学習モデルを作る")
@@ -79,7 +105,8 @@ def main(argv: list[str] | None = None) -> int:
     a = ap.parse_args(argv)
     try:
         if a.cmd == "predict":
-            pred, label = run_predict(a.csv, a.method, a.model, a.weights, not a.no_odds)
+            pred, label = run_predict(a.csv, a.method, a.model, a.weights, not a.no_odds,
+                                      a.runs, a.history)
             print(f"予想方式: {label}\n")
             print(format_all(pred))
             if a.out:
