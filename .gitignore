@@ -367,3 +367,5 @@ keiba/**/__pycache__/
 keiba/.pytest_cache/
 keiba/data/cache/
 keiba/data/graded_history.csv
+keiba/data/horse_runs.csv
+keiba/data/*.career.pkl

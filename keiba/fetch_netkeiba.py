@@ -131,7 +131,10 @@ def parse_result(html: str) -> tuple[dict, list[dict]]:
         weight = tds[idx["馬体重"]]
         sex_age = tds[idx["性齢"]]
         jockey_a = tr.find_all("td")[idx["騎手"]].find("a")
+        horse_a = tr.find_all("td")[idx["馬名"]].find("a")
+        hm = re.search(r"/horse/(\d{10})", horse_a["href"]) if horse_a else None
         out.append({
+            "馬ID": hm.group(1) if hm else None,
             "着順": _num(tds[idx["着順"]], int) if tds[idx["着順"]].isdigit() else None,
             "枠番": _num(tds[idx["枠番"]], int), "馬番": _num(tds[idx["馬番"]], int),
             "馬名": tds[idx["馬名"]], "性別": sex_age[:1], "年齢": _num(sex_age[1:], int),

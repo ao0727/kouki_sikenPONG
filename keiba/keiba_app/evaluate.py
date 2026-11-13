@@ -94,6 +94,21 @@ def walk_forward(history: pd.DataFrame, predict_fn, min_train_races: int = 100,
     return pd.concat(preds)
 
 
+def _horse_methods(career: pd.DataFrame | None) -> dict:
+    """馬の全戦績を使う方式（history に戦績特徴量が付いているときだけ使える）。"""
+    from .horse_model import BenterLogit, CareerGBM, HorseGBM
+    m = {
+        "戦績ML（オッズなし）": lambda tr, te: HorseGBM(use_odds=False).fit(tr).predict(te),
+        "戦績ML（オッズあり）": lambda tr, te: HorseGBM(use_odds=True).fit(tr).predict(te),
+        "ベンター式（オッズなし）": lambda tr, te: BenterLogit(use_odds=False).fit(tr).predict(te),
+        "ベンター式（オッズあり）": lambda tr, te: BenterLogit(use_odds=True).fit(tr).predict(te),
+    }
+    if career is not None and len(career):
+        m["全戦績ML（オッズなし）"] = lambda tr, te: CareerGBM(career, False).fit_until(te["日付"].min()).predict(te)
+        m["全戦績ML（オッズあり）"] = lambda tr, te: CareerGBM(career, True).fit_until(te["日付"].min()).predict(te)
+    return m
+
+
 def _methods(weights):
     """方式名 → (学習データ, テストデータ) から予想を返す関数。"""
     def score_fn(use_odds):
@@ -113,7 +128,8 @@ def _methods(weights):
 
 def compare_methods(history: pd.DataFrame, weights=None, test_ratio: float = 0.2,
                     walk: bool = False, min_train_races: int = 100,
-                    test_from: str | None = None) -> pd.DataFrame:
+                    test_from: str | None = None, runs: pd.DataFrame | None = None,
+                    career: pd.DataFrame | None = None, only: list[str] | None = None) -> pd.DataFrame:
     """各方式の成績表を返す。
 
     walk=False: 古い (1 - test_ratio) で学習し、残りの新しいレースでテスト
@@ -121,8 +137,14 @@ def compare_methods(history: pd.DataFrame, weights=None, test_ratio: float = 0.2
     test_from : walk=True のとき、この日付以降のレースをすべてテストする（それより前は学習専用）
     """
     methods = _methods(weights)
+    if runs is not None:
+        from .horse_features import add_horse_features
+        history = add_horse_features(history, runs)
+        methods.update(_horse_methods(career))
+    if only:
+        methods = {k: v for k, v in methods.items() if any(o in k for o in only)}
     if not history["単勝オッズ"].notna().any():
-        methods.pop("人気順（オッズのみ）")
+        methods.pop("人気順（オッズのみ）", None)
     results = {}
     if walk:
         n_races = history["レースID"].nunique()
@@ -138,7 +160,7 @@ def compare_methods(history: pd.DataFrame, weights=None, test_ratio: float = 0.2
     else:
         train, test = split_by_date(history, test_ratio)
         if train["レースID"].nunique() < 30:
-            methods = {k: v for k, v in methods.items() if not k.startswith("機械学習")}
+            methods = {k: v for k, v in methods.items() if "ML" not in k and not k.startswith("機械学習")}
         for name, fn in methods.items():
             results[name] = metrics(fn(train, test))
         n_train, n_test = train["レースID"].nunique(), test["レースID"].nunique()

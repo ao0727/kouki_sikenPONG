@@ -67,6 +67,8 @@ def main(argv: list[str] | None = None) -> int:
                    help="ウォークフォワード: 過去だけで学習し直しながら、ほぼ全期間をテストする")
     c.add_argument("--min-train", type=int, default=100, help="--walk で最初に学習に使うレース数")
     c.add_argument("--test-from", help="--walk でこの日付(YYYY-MM-DD)以降をテストする。それより前は学習専用")
+    c.add_argument("--runs", help="馬の全戦績 CSV（fetch_horses.py で作成）。戦績を使う方式も比べる")
+    c.add_argument("--only", nargs="*", help="名前にこの文字を含む方式だけ比べる（例: --only 人気 ベンター）")
 
     tp = sub.add_parser("template", help="入力用の空 CSV を作る")
     tp.add_argument("csv")
@@ -91,7 +93,21 @@ def main(argv: list[str] | None = None) -> int:
 
         elif a.cmd == "compare":
             hist = load_csv(a.csv, need_result=True)
-            table = compare_methods(hist, load_weights(a.weights), a.test_ratio, a.walk, a.min_train, a.test_from)
+            runs = career = None
+            if a.runs:
+                from .horse_features import load_runs
+                from .horse_model import build_career_table
+                runs = load_runs(a.runs)
+                cache = Path(a.runs).with_suffix(".career.pkl")
+                if cache.exists() and cache.stat().st_mtime > Path(a.runs).stat().st_mtime:
+                    career = pd.read_pickle(cache)
+                else:
+                    print("全戦績から学習データを作成中...", flush=True)
+                    career = build_career_table(runs)
+                    career.to_pickle(cache)
+                print(f"全戦績の学習データ: {len(career)} 走")
+            table = compare_methods(hist, load_weights(a.weights), a.test_ratio, a.walk, a.min_train,
+                                    a.test_from, runs, career, a.only)
             print(f"学習 {table.attrs['学習レース数']} レース → テスト {table.attrs['テストレース数']} レース\n")
             show = table.copy()
             for col in ["本命の単勝的中率", "本命の複勝率", "馬連的中率(3点)", "ワイド的中率(2点)",
