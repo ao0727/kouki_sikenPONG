@@ -55,7 +55,24 @@ def format_race(pred: pd.DataFrame) -> str:
     lines.append("-" * 64)
     lines.append("【買い目の例】")
     lines += ["  " + s for s in suggest_bets(r)]
+    lines += value_bets(r)
     return "\n".join(lines)
+
+
+def value_bets(r: pd.DataFrame, per_type: int = 2) -> list[str]:
+    """券種ごとに、推定期待値の高い買い目を表示する（単勝オッズが全頭そろっているときだけ）。"""
+    if r["単勝オッズ"].isna().any() or len(r) < 5:
+        return []
+    from .betting import race_tickets
+    t = race_tickets(r)
+    lines = ["【券種別・推定期待値の上位】（推定オッズは単勝オッズからの計算値。実際のオッズで再確認を）"]
+    for kind in ["複勝", "ワイド", "馬連", "馬単", "三連複", "三連単"]:
+        top = t[t["券種"] == kind].sort_values("期待値", ascending=False).head(per_type)
+        txt = " / ".join(f"{k}（的中{p*100:.1f}% 推定{o:.1f}倍 期待値{e:.2f}）"
+                         for k, p, o, e in zip(top["組番"], top["確率"], top["推定オッズ"], top["期待値"]))
+        lines.append(f"  {kind:<4} {txt}")
+    lines.append("  ※ 過去3年の重賞での検証では、期待値 1 以上の買い目だけ買っても回収率 100% を超えませんでした")
+    return lines
 
 
 def format_all(pred: pd.DataFrame) -> str:

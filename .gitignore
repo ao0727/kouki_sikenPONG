@@ -369,3 +369,6 @@ keiba/data/cache/
 keiba/data/graded_history.csv
 keiba/data/horse_runs.csv
 keiba/data/*.career.pkl
+keiba/data/payouts.csv
+keiba/data/oos_predictions.csv
+keiba/data/strategy_*.csv
