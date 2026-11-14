@@ -20,7 +20,11 @@ from keiba_app.payouts import parse_payouts
 
 def race_ids_on(d: date) -> list[tuple[str, str]]:
     ymd = d.strftime("%Y%m%d")
-    html = fetch(f"https://race.netkeiba.com/top/race_list_sub.html?kaisai_date={ymd}", f"day_{ymd}.html")
+    try:
+        html = fetch(f"https://race.netkeiba.com/top/race_list_sub.html?kaisai_date={ymd}", f"day_{ymd}.html")
+    except Exception as e:   # 開催のない日はエラーになることがある
+        print(f"  {ymd} の日程を取得できませんでした（開催なしとみなします）: {e}", flush=True)
+        return []
     out = []
     for li in BeautifulSoup(html, "lxml").select("li.RaceList_DataItem"):
         a = li.find("a")
