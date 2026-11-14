@@ -373,3 +373,5 @@ keiba/data/payouts.csv
 keiba/data/oos_predictions.csv
 keiba/data/strategy_*.csv
 keiba/data/entries_*.csv
+keiba/data/all_results.csv
+keiba/data/all_payouts.csv
