@@ -56,7 +56,13 @@ def _predict_with_runs(df, method, runs_path, history_path, use_odds):
     entries = add_horse_features(df, runs)
     odds_txt = "オッズあり" if use_odds else "オッズなし"
     if method == "career":
-        model = CareerGBM(build_career_table(runs), use_odds).fit_until(df["日付"].min())
+        cache = Path(runs_path).with_suffix(".career.pkl")
+        if cache.exists():                      # 学習データは作るのに数分かかるので保存版を使う
+            career = pd.read_pickle(cache)
+        else:
+            career = build_career_table(runs)
+            career.to_pickle(cache)
+        model = CareerGBM(career, use_odds).fit_until(df["日付"].min())
         return model.predict(entries), f"全戦績ML（{odds_txt}）"
     if not history_path or not Path(history_path).exists():
         raise FileNotFoundError("ベンター式には --history に過去の重賞 CSV が必要です")
@@ -99,6 +105,11 @@ def main(argv: list[str] | None = None) -> int:
     tp = sub.add_parser("template", help="入力用の空 CSV を作る")
     tp.add_argument("csv")
     tp.add_argument("--with-result", action="store_true", help="着順列も付ける（過去レース用）")
+
+    pf = sub.add_parser("profile", help="各馬の近走・得意条件と、戦績からの予想を表示する")
+    pf.add_argument("csv", help="fetch_entries.py で作った出馬表 CSV（馬ID 列が必要）")
+    pf.add_argument("--runs", default="data/horse_runs.csv")
+    pf.add_argument("--history", default="data/graded_history.csv")
 
     sub.add_parser("gui", help="画面で操作する")
 
@@ -151,6 +162,20 @@ def main(argv: list[str] | None = None) -> int:
             cols = ENTRY_COLUMNS + (["着順"] if a.with_result else [])
             pd.DataFrame(columns=cols).to_csv(a.csv, index=False, encoding="utf-8-sig")
             print(f"{a.csv} を作りました。Excel で開いて 1 行 = 1 頭で入力してください。")
+
+        elif a.cmd == "profile":
+            from .horse_features import load_runs
+            from .profile import format_profiles
+            df = load_csv(a.csv)
+            has_odds = df["単勝オッズ"].notna().all()
+            method = "benter" if has_odds else "career"
+            pred, label = _predict_with_runs(df, method, a.runs, a.history, use_odds=has_odds)
+            print(f"{df['レース名'].iloc[0] if 'レース名' in df else ''}  予想方式: {label}")
+            if not has_odds:
+                print("（単勝オッズが空なので、戦績と得意条件だけで予想しています。"
+                      "オッズを CSV に入れると、オッズも使うベンター式になります）")
+            print()
+            print(format_profiles(pred, load_runs(a.runs), pred))
 
         elif a.cmd == "gui":
             from .gui import run_gui

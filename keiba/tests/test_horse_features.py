@@ -61,3 +61,10 @@ def test_benter_probabilities_sum_to_one():
     h = prepare(pd.DataFrame(rows), need_result=True)
     pred = BenterLogit().fit(h).predict(h)
     assert np.allclose(pred.groupby("レースID")["勝率"].sum(), 1.0)
+
+
+def test_same_jockey_handles_abbreviations():
+    from keiba_app.horse_features import same_jockey
+    s = pd.Series(["岩田望来", "岩田康誠", "Ｃ．デムーロ", "ルメール"])
+    assert same_jockey(s, "岩田望").tolist() == [True, False, False, False]
+    assert same_jockey(s, "Ｃデムーロ").tolist() == [False, False, True, False]

@@ -39,6 +39,17 @@ RELATIVE = ["近3走着差", "近3走着順率", "前走クラス", "近3走人�
             "通算複勝率", "平均位置取り", "重賞複勝率"]
 
 
+def _norm_jockey(name) -> str:
+    return str(name or "").replace("．", "").replace(".", "").replace(" ", "").replace("\u3000", "")
+
+
+def same_jockey(series: pd.Series, jockey: str) -> pd.Series:
+    """出馬表は「岩田望」、戦績は「岩田望来」のように略し方が違うので、前方一致で同じ騎手とみなす。"""
+    j = _norm_jockey(jockey)
+    s = series.map(_norm_jockey)
+    return s.map(lambda x: bool(x) and bool(j) and (x.startswith(j) or j.startswith(x)))
+
+
 def _turn(venue: str | None) -> str | None:
     if venue in RIGHT_TURN:
         return "右"
@@ -122,8 +133,9 @@ def features_from_past(past: pd.DataFrame, today: dict) -> dict:
         f["斤量変化"] = float(today["斤量"] - past["斤量"].iloc[0])
     jockey = today.get("騎手")
     if jockey:
-        f["騎手継続"] = float(past["騎手"].iloc[0] == jockey)
-        f["騎手との複勝率"] = _rate(past[past["騎手"] == jockey], base)
+        same = same_jockey(past["騎手"], jockey)
+        f["騎手継続"] = float(same.iloc[0])
+        f["騎手との複勝率"] = _rate(past[same], base)
     pos = (past["最初の通過順"] / past["頭数"]).head(5)
     f["平均位置取り"] = float(pos.mean()) if pos.notna().any() else np.nan
     return f
