@@ -1,0 +1,28 @@
+# 試作1本目：雑学掛け合い
+title: "フラミンゴは\n生まれつきピンクじゃない!?"
+hashtags: ["#雑学", "#ずんだもん", "#四国めたん", "#動物", "#shorts"]
+description: |
+  フラミンゴのピンク色の正体を、ずんだもんと四国めたんが解説！
+  知ってたらコメントで教えてね。
+
+lines:
+  - speaker: zundamon
+    text: "めたん！フラミンゴって生まれたときからピンクなのだ？"
+  - speaker: metan
+    text: "実はね、ヒナのときは灰色っぽい白なのよ。"
+  - speaker: zundamon
+    text: "えっ、じゃあなんでピンクになるのだ！？"
+  - speaker: metan
+    text: "答えは食べ物。エサの藻やエビに含まれる、カロテノイドという色素のせいなの。"
+  - speaker: zundamon
+    text: "ニンジンのオレンジ色と同じ仲間なのだ？"
+  - speaker: metan
+    text: "そう。その色素が羽にたまって、ピンクに染まっていくのよ。"
+  - speaker: zundamon
+    text: "じゃあエサを変えたら…？"
+  - speaker: metan
+    text: "色がだんだん薄くなるわ。だから動物園では、色素入りのエサをあげているの。"
+  - speaker: zundamon
+    text: "フラミンゴのピンクは、ごはんの色だったのだ！"
+  - speaker: metan
+    text: "他にも知りたい雑学があったら、コメントで教えてね。"

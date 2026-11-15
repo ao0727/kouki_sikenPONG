@@ -18,7 +18,20 @@
 | `build/video/` | 中間動画 | × |
 | `output/` | 完成した mp4 | × |
 
-## 処理の流れ（予定）
+## 使い方（Windows）
+
+1. [VOICEVOX](https://voicevox.hiroshiba.jp/) をインストールして起動しておく
+2. Python 3.10 以上をインストール
+3. `make_short.bat scripts\001_flamingo.yaml` を実行（初回は自動でライブラリを入れる）
+4. `output\001_flamingo.mp4` と `output\001_flamingo_投稿用.txt` ができる
+
+- VOICEVOX 無しで動作確認だけしたいとき: `make_short.bat scripts\001_flamingo.yaml --dummy-tts`
+- 立ち絵: `assets/characters/zundamon.png`, `metan.png`（透過PNG）を置くと丸の代わりに表示
+- 背景: `assets/backgrounds/` に png/jpg を置くと使用
+- BGM: `assets/bgm/` に mp3/wav を置くと音量12%で自動ミックス
+- 台本のタイトルは `\n` で改行位置を指定できる
+
+## 処理の流れ
 
 1. `scripts/` に台本を書く
 2. VOICEVOX エンジンでセリフごとに音声を生成 → `build/audio/`
